@@ -30,12 +30,22 @@ Understading medallion architecture inspired by Databricks is crucial, as differ
 **Bronze layer** \
 The table in bronze layer correspond to the source in addition to potential metadata columns capturing, for example, load time and source system. For instance, bronze layer could be an archive of source and is therefore the most important and protected layer in the architecture.
 
-In our grocery store example, this could mean that the Bronze layer stores data for inserts (new items) but also if some value in a row is changed (stock price is changed). 
+In our grocery store example, this could mean that the Bronze layer stores data for inserts (new items) but also if some value in a row is changed (e.g. price is changed). 
+
+**Example**
 
 | product | id   | price | version |
 |---------|------|-------|---------|
 | apple   | 1289 | 20    | 0       |
 
+The entrepreneur updates price
+
+| product | id   | price | version |
+|---------|------|-------|---------|
+| apple   | 1289 | 20    | 0       |
+| apple   | 1289 | 15    | 1       |
+
+We can see that now data in the Bronze layer have an updated version of the product with id 1289. 
 
 **Silver layer** \
 In the Silver layer, some modifications to data are made, to give an enterprise view of the data to stakeholders. The Silver layer could provide data for reporting, ML and more complex analytics and can be used as a source for any other type of projects as well. 
