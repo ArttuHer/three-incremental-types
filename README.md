@@ -17,23 +17,25 @@ Following the example above, if our ETL process has incremental load, it would c
 ### ETL Process
 Before moving on, let's briefly discuss about the ETL process to get a better understanding of the end to end process. ETL stands fro **Extract**, **Transform** and **Load**. 
 
-**Extract**: \
+**Extract** \
 During the extract step, data is ingested from the source and stored into a landing database. In the landing stage, data is in a raw format and usually not consumed by any end-users. 
 
-**Transform**: In a transformation step, some changes are made to the data. Such changes could be, for example, drop PII data, rename columns or even make aggregations. 
+**Transform** \
+In a transformation step, some changes are made to the data. Such changes could be, for example, drop PII data, rename columns or even make aggregations. 
 
-**Load**: The data is loaded to a location where end-users can consume the data. 
+**Load** \
+The data is loaded to a location where end-users can consume the data. 
 
 ### Medallion Architecture
 Understading medallion architecture inspired by Databricks, is crucial, as loads can be implemented in a different stages of the ETL process. In medallion architecture we have three data layers which represents data at different stages. 
 
-**Bronze layer** 
+**Bronze layer** \
 Ingest data from the source to bronze layer. In this layer, the data is in a raw state.  
 
-**Silver layer**
+**Silver layer** \
 Enrich and validate the data into a condition where end-users can use it.  
 
-**Gold layer** 
+**Gold layer** \
 Provide aggregated and pre-computed data to end-users, such as data analysts and BI dashboards. 
 
 ## Incremental load
