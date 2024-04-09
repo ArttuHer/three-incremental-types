@@ -17,7 +17,8 @@ Following the example above, if our ETL process has incremental load, it would c
 ### ETL Process
 Before moving on, let's briefly discuss about the ETL process to get a better understanding of the end to end process. ETL stands fro **Extract**, **Transform** and **Load**. 
 
-**Extract**: During the extract step, data is ingested from the source and stored into a landing database. In the landing stage, data is in a raw format and usually not consumed by any end-users. 
+**Extract**: \
+During the extract step, data is ingested from the source and stored into a landing database. In the landing stage, data is in a raw format and usually not consumed by any end-users. 
 
 **Transform**: In a transformation step, some changes are made to the data. Such changes could be, for example, drop PII data, rename columns or even make aggregations. 
 
