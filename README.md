@@ -86,8 +86,35 @@ FROM <table_name> GROUP BY product_name`
 
 
 ## Incremental load
+Let's image that source system does not store values for a long time and for reporting purposes, we need data from a longer period. Previously we just performed a full load to show the status in the warehouse, but now the store manager wants to make a line graph show how volumes in the warehouse change over time. 
 
 ### Bookmark Table
+Bookmark table is a table which tracks the latest update in the table. In our example, it could has the following information: 
+
+ |-- db_name: string   
+ |-- table: integer   
+ |-- sequence_by: string    
+ |-- sequence_by_value: string  
+ |-- created_at: timestamp    
+ |-- modified_at: timestamp
+
+From now on, the name of the source database is 'inventory_management_db' and table name is 'products'.  
+Our bookmark table could look like this, based on the state of the source system above: 
+
+| db_name | table   | sequence_by | sequence_by_value |created_at|modified_at|
+|---------|------|-------|---------|---------|---------|
+| inventory_management_db   | products | product_added    | 2024-06-12T05:19:05 | 2024-06-12T07:19:05| 2024-06-12T07:19:05|
+
+
+
+| product | product_category   | price | handler |warehouse|product_added|
+|---------|------|-------|---------|---------|---------|
+| apple   | 1289 | 20    | George Grocery       |A1C2|2024-06-12T05:19:05|
+| apple   | 1289 | 20    | Arnold Assistant       |B2C1|2024-06-11T10:24:05|
+| orange   | 1210 | 5    | Arnold Assistant       |A2C1|2024-06-12T08:24:05|
+
+
+
 
 ### Merge Into
 
