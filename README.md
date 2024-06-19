@@ -6,10 +6,10 @@ This document describes three different ways to implement an incremental load: *
 Before moving on, let's briefly discuss about the ETL process to get a better understanding of the end to end process. ETL stands for **Extract**, **Transform** and **Load**. 
 
 **Extract** \
-During the extract step, data is ingested from the source and stored into a landing database. In the landing stage, data is in a raw format and usually not consumed by end-users. 
+During the extract step, data is ingested from the source system and stored in a raw format. A common practice is to add metadata, such as loaded timestamps and other useful information. Data is not usually consumed by end-users at this stage. 
 
 **Transform** \
-In the transformation step, some changes are made to the data. Such changes could be, for example, droping PII data, renaming columns or even making aggregations. 
+In the transformation step, some changes are made to the data. Such changes could be, for example, droping personal information and renaming columns.
 
 **Load** \
 The data is loaded to a location where end-users can consume the data. 
