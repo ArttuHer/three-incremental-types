@@ -1,6 +1,6 @@
 ## Three possible ways to implement incremental load
 
-This document describes three different ways to implement an incremental load: **Bookmark table**; **Merge into** and **Slowly Chaning Dimensions type 2**.
+This document describes three different ways to implement an incremental load and it is motivated by Databricks medallion architecture and features: **Bookmark table**; **Merge into** and **Slowly Chaning Dimensions type 2**.
 
 ## ETL Process
 Before moving on, let's briefly discuss about the ETL process to get a better understanding of the end to end process. ETL stands for **Extract**, **Transform** and **Load**. 
