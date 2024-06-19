@@ -25,10 +25,10 @@ Following the example above, if we have configured incremental load, it would ch
 
 ## Medallion Architecture
 
-Understading medallion architecture inspired by Databricks is crucial, as different load types can be implemented in a different stages of the ETL process. In medallion architecture we have three data layers which represents data at different stages. 
+Understading medallion architecture inspired by Databricks is crucial, as different load types can be implemented in different layers. In medallion architecture we have three data layers which represents data at different stages. 
 
 **Bronze layer** \
-The table in bronze layer correspond to the source in addition to potential metadata columns capturing, for example, load time and source system. For instance, bronze layer could be an archive of source system and is therefore the most important and protected layer in the architecture.
+The table in bronze layer correspond to the source system in addition to potential metadata columns capturing, for example, load time and the name  of the source system. For instance, bronze layer could act as an archive (cold storage) of the source system and is therefore the most important and protected layer in the architecture.
 
 In our grocery store example, this could mean that the Bronze layer stores data for inserts (new items) but also if some value in a row is changed (e.g. price is changed). 
 
@@ -57,34 +57,45 @@ Lastly, data in the Gold layer is ready for consumption and usually stored into 
 
 **Source system**
 
-We have the following information in the source system, representing the product, product category, price, and the handler who put the product to the enterprise resource system (ERP). 
+We have the following information in the source system:
 
-| product | product_category   | price | handler |
-|---------|------|-------|---------|
-| apple   | 1289 | 20    | George Grocery       |
-| apple   | 1289 | 20    | Arnold Assistant       |
+ |-- product: string   
+ |-- product_category: integer   
+ |-- price: integer  
+ |-- handler: string  
+ |-- warehouse: string  
+ |-- product_added: timestamp
+
+| product | product_category   | price | handler |warehouse|product_added|
+|---------|------|-------|---------|---------|---------|
+| apple   | 1289 | 20    | George Grocery       |A1C2|2024-06-12T05:19:05|
+| apple   | 1289 | 20    | Arnold Assistant       |B2C1|2024-06-11T10:24:05|
 
 **Bronze layer**
 
 In the Bronze layer, we have added additional metadata to capture, when was the last time when this data was updated. 
 
-| product | product_category   | price | handler | loaded_to_bronze |
-|---------|------|-------|---------|---------|
-| apple   | 1289 | 20    | George Grocery       |2024-06-13T08:33:05.000+00:00|
-| apple   | 1289 | 20    | Arnold Assistant       |2024-06-13T08:33:05.000+00:00|
+| product | product_category   | price | handler |warehouse|product_added| loaded_to_bronze |
+|---------|------|-------|---------|---------|---------|---------|
+| apple   | 1289 | 20    | George Grocery       |A1C2|2024-06-12T05:19:05|2024-06-13T08:33:05|
+| apple   | 1289 | 20    | Arnold Assistant       |B2C1|2024-06-11T10:24:05|2024-06-13T08:33:05|
 
 **Silver layer**
 
 In the Silver we have made some changes: changed column names, added metadata and dropped handler column due to GDPR. 
 
-| product_name | product_category   | price | loaded_to_bronze | loaded_to_silver |
-|---------|------|-------|---------|---------|
-| apple   | 1289 | 20    | 2024-06-13T08:33:05.000+00:00|2024-06-13T08:36:07.000+00:00|
-| apple   | 1289 | 20    | 2024-06-13T08:33:05.000+00:00|2024-06-13T08:36:07.000+00:00|
+| product_name | product_category   | price |warehouse|product_added| loaded_to_bronze | loaded_to_silver |
+|---------|------|-------|---------|---------|---------|---------|
+| apple   | 1289 | 20    |A1C2| 2024-06-12T05:19:05|2024-06-13T08:33:05|2024-06-13T08:36:07|
+| apple   | 1289 | 20    |B2C1| 2024-06-11T10:24:05|2024-06-13T08:33:05|2024-06-13T08:36:07|
 
 **Gold layer**
 
-Now the store manager wants to see how many apples there are in the warehouse. For reporting purposes, we could group this data to show aggregated values. It is a good habit to give pre-calculated data to BI report, because usually data analytics engines, such as Apache Spark, can make aggregations faster than regural BI tools. 
+Now the store manager wants to see how many apples there are in all warehouses. For reporting purposes, we could group this data by product name to show aggregated values. It is a good habit to give pre-calculated data to BI report, because usually data analytics engines, such as Apache Spark, can make aggregations faster than regural BI tools. 
+
+This query can be used to create this example table:  
+`SELECT product_name, product_category, price, units
+FROM <table_name> GROUP BY product_name`
 
 | product_name | product_category   | price | units |
 |---------|------|-------|---------|
