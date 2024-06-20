@@ -106,7 +106,7 @@ Our bookmark table could look like this, based on the state of the source system
 | inventory_management_db   | products | product_added    | 2024-06-13T05:19:05 | 2024-06-13T08:33:05|2024-06-13T08:33:05|
 
 
-Now a row has been added to the source database (last row). Instead of full load, we could append the latest row to the target table. 
+A new row has been added to the source database (last row). Instead of full load, we could append the latest row to the target table. 
 | product | product_category   | price | handler |warehouse|product_added|
 |---------|------|-------|---------|---------|---------|
 | apple   | 1289 | 20    | Arnold Assistant       |B2C1|2024-06-13T05:19:05|
