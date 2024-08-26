@@ -86,10 +86,10 @@ FROM <table_name> GROUP BY product_name`
 
 
 ## Incremental load
-Let's image that source system does not store values for a long time and for reporting purposes, we need data from a longer period. Previously we just performed a full load to show the status in the warehouse, but now the store manager wants to make a line graph show how volumes in the warehouse change over time. 
+Let's image that source system does not store values for a long time and for reporting purposes, we need data from a longer period. Previously we just performed a full load to show the status in the warehouse, but now the store manager wants to make a figure to show how volumes in the warehouse have changed over time. 
 
 ### Bookmark Table
-Bookmark table is a table which tracks the latest update in the target table. In our example, it could has the following information: 
+Bookmark table is a table which tracks the latest update in the target table. In our example, it could have the following information: 
 
  |-- db_name: string   
  |-- table: integer   
@@ -106,26 +106,26 @@ Our bookmark table could look like this, based on the state of the source system
 | inventory_management_db   | products | product_added    | 2024-06-13T05:19:05 | 2024-06-13T08:33:05|2024-06-13T08:33:05|
 
 
-A new row has been added to the source database (last row). Instead of full load, we could append the latest row to the target table. 
+A new row has been added to the source database (the last row). Instead of full load, we could append the latest row to the target table. 
 | product | product_category   | price | handler |warehouse|product_added|
 |---------|------|-------|---------|---------|---------|
 | apple   | 1289 | 20    | Arnold Assistant       |B2C1|2024-06-13T05:19:05|
 | apple   | 1289 | 20    | George Grocery       |A1C2|2024-06-12T05:19:05|
-| orange   | 1210 | 5    | Arnold Assistant       |A2C1|2024-06-14T08:24:05|
+| orange   | 1210 | 5    | Arnold Assistant       |A2C1|**2024-06-14T08:24:05**|
 
-Firstly, our code checks that the previous sequence by value in the bookmark table is 2024-06-13T05:19:05. Secondly, it would load values that has been wrote after the value in the bookmark table. Lastly, bookmark table is updated. 
+Firstly, our code checks that the previous sequence by value in the bookmark table is **2024-06-13T05:19:05**. Secondly, it would load values that has been wrote after the value in the bookmark table. Lastly, bookmark table is updated. 
 
 **Now bronze looks like this**
 | product | product_category   | price | handler |warehouse|product_added| loaded_to_bronze |
 |---------|------|-------|---------|---------|---------|---------|
-| orange   | 1210 | 5    | Arnold Assistant       |A2C1|2024-06-14T08:24:05|2024-06-14T08:33:05|
+| orange   | 1210 | 5    | Arnold Assistant       |A2C1|**2024-06-14T08:24:05**|2024-06-14T08:33:05|
 | apple   | 1289 | 20    | Arnold Assistant       |B2C1|2024-06-13T05:19:05|2024-06-13T08:33:05|
 | apple   | 1289 | 20    | George Grocery       |A1C2|2024-06-12T05:19:05|2024-06-13T08:33:05|
 
 **Bookmark table is updated**
 | db_name | table   | sequence_by | sequence_by_value |created_at|modified_at|
 |---------|------|-------|---------|---------|---------|
-| inventory_management_db   | products | product_added    | 2024-06-14T08:24:05 | 2024-06-12T07:19:05| 2024-06-14T08:33:05|
+| inventory_management_db   | products | product_added    | **2024-06-14T08:24:05** | 2024-06-12T07:19:05| 2024-06-14T08:33:05|
 
 ### Merge Into
 
