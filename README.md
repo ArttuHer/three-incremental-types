@@ -128,6 +128,13 @@ Firstly, our code checks that the previous sequence by value in the bookmark tab
 | inventory_management_db   | products | product_added    | **2024-06-14T08:24:05** | 2024-06-12T07:19:05| 2024-06-14T08:33:05|
 
 ### Merge Into
+We can use merge into (inspired by Databricks https://docs.databricks.com/en/sql/language-manual/delta-merge-into.html) to perform an incremental load. 
+Let's imagine that there is another table called 'product_log' which have two columns: product_category and log_id to capture some information about the process. Rows are deleted from the source periodically and we need to store historical values as well for further processing. 
+
+In the previous example, bookmark table assumed that there is a column which can be used to order the data to descending order. However, in this case, we don't have such column and need to change our approach to handle the incremental load. 
+Databricks merge into can help us to tackle this problem. 
+
+We need to have two tables: one table performing full load every load time and the other table, where rows are incrementally added. 
 
 ### Incremental with SDC 2
 
