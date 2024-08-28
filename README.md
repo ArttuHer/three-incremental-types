@@ -177,9 +177,33 @@ Now target table is updated:
 #### Pros and cons in Merge into
 **Pros**
 - Easy configuration for DML statements
+- Allows other configuration options, like schema evolution and not matched/matched
 - No need to worry about columns used to ordering
+  
 **Cons**
 - Full load is performed every time
 - If source table is big, it can take some time to perform full load
 ### Incremental with SDC 2
+The last example is done with using slowly changing dimensions (SDC) and its' option 2. Option 1 overwrites a row and option 2 adds a new row and accumulate row-level history. 
+We could have a use case where the store manager want's to keep historical values for future usage but in the current report, she wants to use only the latest value of each row. 
+
+We could use incremental load with bookmark table on the Bronze layer and on the silver layer we have one "staging" table, which has all Bronze layer data (+ additional metadata / other changes) with row-level history and a table which has only the latest record of each item and consumed by the manager. 
+
+In the simplest terms, we could use Databricks Delta Live Tables to apply these changes from this staging table to silver table. We just need to perform a combination of keys which can be used to determine which row is the latest. In this example, we could use product_category and product_added. 
+
+**Staging table** could look like this. We can see that there are two apples and two oranges added at different times. 
+| product | product_category   | price | handler |warehouse|product_added|
+|---------|------|-------|---------|---------|---------|
+| apple   | 1289 | 20    | Arnold Assistant       |B2C1|2024-06-13T05:19:05|
+| apple   | 1289 | 20    | George Grocery       |A1C2|2024-06-12T05:19:05|
+| orange   | 1210 | 5    | Arnold Assistant       |A2C1|2024-06-14T08:24:05|
+| orange   | 1210 | 5    | Arnold Assistant       |A2C1|2024-06-14T10:24:05|
+
+With Delta Live tables, we could read from this staging table and create the silver table containing only the latest rows. 
+
+**Silver table**. Now the store manager would see the current status of his warehouse, without removing any data and avoiding full load to source system. 
+| product | product_category   | price | handler |warehouse|product_added|
+|---------|------|-------|---------|---------|---------|
+| apple   | 1289 | 20    | Arnold Assistant       |B2C1|2024-06-13T05:19:05|
+| orange   | 1210 | 5    | Arnold Assistant       |A2C1|2024-06-14T10:24:05|
 
