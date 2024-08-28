@@ -136,15 +136,50 @@ Databricks merge into can help us to tackle this problem.
 
 We need to have two tables: one table performing full load every load time and the other table, where rows are incrementally added. 
 
-**product_log** table from the source:
+**product_log** full load table from the source: 
 | product_category | log_id   | explanation |
 |---------|------| ------|
 | 1210   | 4459 | fruits|
 | 1289   | 4459 | fruits|
 
-Now, in the database we would have one table (the full load table) which represents always the status of the source.
-Every time when the data pipeline is triggered, the full load table is updated at first and it will check what rows are not present in the target table (that is, the incrementally loaded table). 
-If there are new rows in the source, these rows will be added to the target. Also, users can decide how to treat updates: whether or not to add them as new row to the target. 
+Let's assume that delete and insert statements are performed against the source system. Now full load table is updated: 
+| product_category | log_id   | explanation |
+|---------|------| ------|
+| 1210   | 4459 | fruits|
+| 1215   | 4450 | bread|
 
+We can see that  product_category **1289** was dropped and **1215** was added. Now our code will compare the full load table and target table and see that product_category and log_id combination **1215** and **4450** is not there. 
+As a result, new row will be added to the target: 
+
+| product_category | log_id   | explanation |
+|---------|------| ------|
+| 1210   | 4459 | fruits|
+| 1289   | 4459 | fruits|
+| 1215   | 4450 | bread|
+
+How about updates? We can also configure that updates are added as a new row, if there is a use case where row-level history is needed. 
+Bread category is updated in the source: 
+
+| product_category | log_id   | explanation |
+|---------|------| ------|
+| 1210   | 4459 | fruits|
+| 1215   | 4450 | artisan-bread|
+
+Now target table is updated: 
+
+| product_category | log_id   | explanation |
+|---------|------| ------|
+| 1210   | 4459 | fruits|
+| 1289   | 4459 | fruits|
+| 1215   | 4450 | bread|
+| 1215   | 4450 | artisan-bread|
+
+#### Pros and cons in Merge into
+**Pros**
+- Easy configuration for DML statements
+- No need to worry about columns used to ordering
+**Cons**
+- Full load is performed every time
+- If source table is big, it can take some time to perform full load
 ### Incremental with SDC 2
 
